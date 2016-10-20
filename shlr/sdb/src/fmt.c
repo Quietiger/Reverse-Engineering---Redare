@@ -20,22 +20,19 @@ SDB_API char *sdb_fmt(int n, const char *fmt, ...) {
 	static char Key[16][256];
 	static int cyclic_n = 0;
 	va_list ap;
-	if (n == -1) {
+	if (n==-1) {
 		if (fmt) {
 			n = cyclic_n++;
-			if (cyclic_n > 15) {
+			if (cyclic_n>15)
 				cyclic_n = 0;
-			}
 		} else {
 			n = cyclic_n;
 		}
 	}
-	if (n < 0 || n > 15) {
-		return NULL;
-	}
-	if (!fmt) {
+        if (n<0 || n>15)
+                return NULL;
+	if (fmt == NULL)
 		return Key[n];
-	}
 	va_start (ap, fmt);
 	*Key[n] = 0;
 	vsnprintf (Key[n], sizeof (Key[n]), fmt, ap);
@@ -128,10 +125,16 @@ SDB_API void sdb_fmt_free (void *stru, const char *fmt) {
 		case 'p': // TODO: leak or wat
 		case 'b':
 		case 'h':
-		case 'd': break;
-		case 'q': n = 8; break;
+		case 'd':
+			/* do nothing */
+			break;
+		case 'q':
+			n = 8;
+			break;
 		case 'z':
-		case 's': free ((void*)*((char**)(stru+len))); break;
+		case 's':
+			free ((void*)*((char**)(stru + len)));
+			break;
 		}
 		len += R_MAX ((long)sizeof (void*), n); // align
 	}

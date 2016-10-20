@@ -485,12 +485,18 @@ next_quote:
 				[--]foo    # pop
 				[--]foo=b  # <invalid>
 #endif
-				if (eq) {
-					sdb_array_push (s, p, val, 0);
+				if (cmd[1] == '-' && eq) {
+					/* invalid syntax */
+				} else if (cmd[1] == '+' && !eq) {
+					/* invalid syntax */
 				} else {
-					char *ret = sdb_array_pop (s, p, 0);
-					out_concat (ret);
-					free (ret);
+					if (eq) {
+						sdb_array_push (s, p, val, 0);
+					} else {
+						char *ret = sdb_array_pop (s, p, 0);
+						out_concat (ret);
+						free (ret);
+					}
 				}
 			} else
 			// [+]foo        remove first element */
@@ -658,18 +664,26 @@ next_quote:
 		if (eq) {
 			// 1 0 kvpath=value
 			// 1 1 kvpath:jspath=value
-			if (encode)
+			if (encode) {
 				val = sdb_encode ((const ut8*)val, -1);
-			if (json>eq) json = NULL;
+			}
+			if (json > eq) {
+				json = NULL;
+			}
+
 			if (json) {
 				*json++ = 0;
 				ok = sdb_json_set (s, cmd, json, val, 0);
-			} else ok = sdb_set (s, cmd, val, 0);
+			} else {
+				ok = sdb_set (s, cmd, val, 0);
+			}
 			if (encode) {
 				free ((void*)val);
 				val = NULL;
 			}
-			if (ok && buf) *buf = 0;
+			if (ok && buf) {
+				*buf = 0;
+			}
 		} else {
 			// 0 1 kvpath:jspath
 			// 0 0 kvpath
@@ -697,11 +711,13 @@ next_quote:
 			} else {
 				// sdbget
 				if ((q = sdb_const_get (s, cmd, 0))) {
-					if (encode)
+					if (encode) {
 						q = (void*)sdb_decode (q, NULL);
+					}
 					out_concat (q);
-					if (encode)
+					if (encode) {
 						free ((void*)q);
+					}
 				}
 			}
 		}
@@ -717,10 +733,13 @@ runNext:
 		encode = 0;
 		goto repeat;
 	}
-	if (eq) *--eq = '=';
+	if (eq) {
+		*--eq = '=';
+	}
 fail:
-	if (bufset)
+	if (bufset) {
 		free (buf);
+	}
 	if (out) {
 		res = out->buf;
 		free (out);
@@ -737,9 +756,12 @@ SDB_API int sdb_query (Sdb *s, const char *cmd) {
 	int must_save = ((*cmd=='~') || strchr (cmd, '='));
 	out = sdb_querys (s, buf, sizeof (buf)-1, cmd);
 	if (out) {
-		if (*out) puts (out);
-		if (out != buf)
+		if (*out) {
+			puts (out);
+		}
+		if (out != buf) {
 			free (out);
+		}
 	}
 	return must_save;
 }
