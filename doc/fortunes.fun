@@ -195,3 +195,4 @@ Beer in mind.
 r2 -- leading options since 2006
 don’t feed the bugs! (except delicious stacktraces)!
 feed the bugs!
+There are 5 minutes from WTF to FIX in r2land

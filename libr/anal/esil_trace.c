@@ -124,7 +124,14 @@ R_API void r_anal_esil_trace (RAnalEsil *esil, RAnalOp *op) {
 
 R_API void r_anal_esil_trace_list (RAnalEsil *esil) {
 	/* TODO. make output more userfriendly */
-	sdb_list (esil->db_trace);
+	// sdb_list (esil->db_trace);
+	SdbListIter *iter;
+	SdbList *list = sdb_foreach_list (esil->db_trace);
+const char *kv;
+	ls_foreach (list, iter, kv) {
+		eprintf ("%p\n", kv);
+	}
+	r_list_free (list);
 }
 
 R_API void r_anal_esil_trace_show(RAnalEsil *esil, int idx) {
